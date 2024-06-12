@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends MongoRepository<Room, String> {
     @Override
-    Optional<Room> save(Room entity);
+    Room save(Room entity);
 }
