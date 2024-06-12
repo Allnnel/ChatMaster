@@ -18,9 +18,12 @@ public class MessageServiceImpl implements MessageService {
     private MessageRepository messageRepository;
 
     @Override
-    public Message save(Message message) {
-
-        return messageRepository.save(message);
+    public Message save(Message message) throws CustomException {
+        Optional<Message> messageSaved = messageRepository.save(message);
+        if(!messageSaved.isPresent()) {
+            throw new CustomException("MESSAGE_NOT_FOUND", 404);
+        }
+        return messageSaved.get();
     }
 
     @Override

@@ -19,8 +19,12 @@ public class RoomServiceImpl implements RoomService {
     private MessageRepository messageRepository;
 
     @Override
-    public Room saveRoom(Room room) {
-         return roomRepository.save(room);
+    public Room saveRoom(Room room) throws CustomException {
+        Optional<Room> roomSaved = roomRepository.save(room);
+        if(!roomSaved.isPresent()) {
+            throw new CustomException("ROOM_NOT_FOUND", 404);
+        }
+        return roomSaved.get();
     }
 
     @Override
