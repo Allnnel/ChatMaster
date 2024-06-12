@@ -30,7 +30,7 @@ public class WebSocketController {
 
     @MessageMapping("/chat.createRoom/{roomName}")
 //    @SendTo("/topic/queue/response")
-    public void createRoom(@DestinationVariable String roomName, Principal principal) {
+    public void createRoom(@DestinationVariable String roomName, Principal principal) throws CustomException {
         System.out.println("roomName == " + roomName + ", principal == " + principal);
         if (principal instanceof Authentication authentication) {
             if (authentication.getPrincipal() instanceof SenderDto senderDto) {
