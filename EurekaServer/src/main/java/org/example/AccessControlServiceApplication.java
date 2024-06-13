@@ -8,6 +8,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 @EnableEurekaServer
 public class AccessControlServiceApplication {
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(AccessControlServiceApplication.class);
+        SpringApplication.run(AccessControlServiceApplication.class, args);
     }
 }
+
