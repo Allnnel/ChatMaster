@@ -12,7 +12,6 @@
     <properties>
         <java.version>17</java.version>
         <spring-boot.version>2.7.0</spring-boot.version>
-        <spring-cloud.version>2021.0.3</spring-cloud.version> <!-- Обновлено: добавлена версия Spring Cloud -->
         <spring-data-mongodb.version>3.3.5</spring-data-mongodb.version>
         <mongodb.version>4.4.2</mongodb.version>
         <hibernate.version>5.6.0.Final</hibernate.version>
@@ -22,62 +21,77 @@
         <jjwt.version>0.11.3</jjwt.version>
         <swagger.version>3.0.0</swagger.version>
         <postgresql.version>42.2.24</postgresql.version>
+        <spring-cloud.version>2021.0.0</spring-cloud.version>
+        <spring-loadbalancer.version>3.1.5</spring-loadbalancer.version>
+        <spring-gateway.version>3.1.5</spring-gateway.version>
+        <spring-eureka-client.version>3.0.4</spring-eureka-client.version>
     </properties>
 
-    <!-- Управление зависимостями -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+<!--    <dependencyManagement>-->
+<!--        <dependencies>-->
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-dependencies</artifactId>-->
+<!--                <version>${spring-cloud.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
+<!--        </dependencies>-->
+<!--    </dependencyManagement>-->
 
     <!-- Зависимости проекта -->
     <dependencies>
 
-        <!-- Spring Cloud Starter Eureka Client -->
+<!--        &lt;!&ndash; Spring Cloud eureka client &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+<!--            <version>${spring-eureka-client.version}</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; Spring Cloud gateway &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-gateway</artifactId>-->
+<!--            <version>${spring-gateway.version}</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; Spring Cloud LoadBalancer &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-loadbalancer</artifactId>-->
+<!--            <version>${spring-loadbalancer.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- Spring Boot Starter Web -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- Spring Boot Starter Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
-        <!-- Spring Boot Starter Web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- Spring Boot Starter Websocket -->
+        <!-- websocket  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- Spring Boot Starter Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
-        <!-- Jackson Databind -->
+        <!-- tests java class to HTTP string -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -91,7 +105,7 @@
             <version>${javax.version}</version>
         </dependency>
 
-        <!-- Lombok -->
+        <!-- lombok get set -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -99,7 +113,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- JWT Dependencies -->
+        <!-- Зависимость для работы с JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -125,33 +139,32 @@
             <version>${swagger.version}</version>
         </dependency>
 
-        <!-- Spring Integration -->
         <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-core</artifactId>
             <version>5.5.2</version> <!-- Укажите актуальную версию -->
         </dependency>
 
-        <!-- Spring Data MongoDB -->
+        <!-- MongoDB -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-mongodb</artifactId>
             <version>${spring-data-mongodb.version}</version>
         </dependency>
-
         <!-- MongoDB Java Driver -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
             <version>${mongodb.version}</version>
         </dependency>
-
-        <!-- BSON for MongoDB -->
+        <!-- Server MongoDB
+         это бинарное представление JSON, используемое MongoDB для хранения и передачи данных -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>bson</artifactId>
             <version>${mongodb.version}</version>
         </dependency>
+
 
     </dependencies>
 
