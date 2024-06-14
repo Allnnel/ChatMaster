@@ -1,24 +1,32 @@
 package org.example.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.attribute.User;
 import org.example.attribute.response.ResponseMessageObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpServerErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.lang.System.out;
 
 @Component
 public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<JwtAuthGatewayFilterFactory.Config> {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthGatewayFilterFactory.class);
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -29,30 +37,45 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
 
     @Override
     public GatewayFilter apply(Config config) {
-        out.println("111111111111");
         return (exchange, chain) -> {
-                HttpHeaders headers = exchange.getRequest().getHeaders();
-                if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
-                    return Mono.error(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Missing authorization header"));
-                }
-                String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
-                String url = "http://AUTH-SERVICE/api/auth/user?token=" + authHeader;
-                try {
-                    ResponseMessageObject responseMessageObject = restTemplate.getForObject(url, ResponseMessageObject.class);
-                    if (responseMessageObject.getCode() != 200) {
-                        return Mono.error(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, responseMessageObject.getMessage()));
-                    }
-                    User user = (User) responseMessageObject.getObject();
-                    String userRole = user.getRole();
+            HttpHeaders headers = exchange.getRequest().getHeaders();
+            if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
+                return Mono.error(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Missing authorization header"));
+            }
 
-                    // Проверка роли пользователя
-                    Set<String> allowedRoles = new HashSet<>(Arrays.asList(config.getAllowedRoles()));
-                    if (!allowedRoles.contains(userRole)) {
-                        return Mono.error(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Access denied. Insufficient role."));
-                    }
-                } catch (HttpClientErrorException ex) {
-                    return Mono.error(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
+            String token = headers.getFirst(HttpHeaders.AUTHORIZATION).replace("Bearer ", "");
+            logger.info("Auth Header: {}", token);
+            String url = "http://auth-service/api/auth/user?token=" + token;
+
+            try {
+                ResponseEntity<ResponseMessageObject> responseEntity = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<ResponseMessageObject>() {}
+                );
+
+                ResponseMessageObject responseMessageObject = responseEntity.getBody();
+
+                if (responseEntity.getStatusCode() != HttpStatus.OK || responseMessageObject.getCode() != 200) {
+                    return Mono.error(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, responseMessageObject.getMessage()));
                 }
+
+                User user = objectMapper.convertValue(responseMessageObject.getObject(), User.class);
+                String userRole = user.getRole();
+                logger.info("User Role: {}", userRole);
+
+            } catch (ResourceAccessException e) {
+                logger.error("Unable to connect to AUTH-SERVICE", e);
+                return Mono.error(e);
+            } catch (HttpClientErrorException ex) {
+                logger.error("Unauthorized access", ex);
+                return Mono.error(ex);
+            } catch (HttpServerErrorException ex) {
+                logger.error("Server error", ex);
+                return Mono.error(ex);
+            }
+
             return chain.filter(exchange);
         };
     }

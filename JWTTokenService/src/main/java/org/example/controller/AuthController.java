@@ -31,7 +31,9 @@ public class AuthController {
 
     @GetMapping("user")
     public ResponseEntity<ResponseMessage> getUser(@RequestParam String token) throws CustomException {
+        out.println("getUser");
         User user = userService.findByToken(token);
+        out.println("user == " + user);
         return ResponseEntity.ok().body(
                 new ResponseMessageObject("Success", null, 200, token, new UserDto(user.getLogin(), user.getRole(), user.getPhone()))
         );

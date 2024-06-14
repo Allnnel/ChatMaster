@@ -11,6 +11,8 @@ import lombok.Setter;
 public class ResponseMessageObject extends ResponseMessage{
     @JsonProperty("object")
     private Object object;
+    public ResponseMessageObject() {
+    }
     public ResponseMessageObject(String status, String message, int code, String jwtToken, Object object) {
         super(status, message, code, jwtToken);
         this.object = object;
