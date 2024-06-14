@@ -1,0 +1,63 @@
+#server:
+#  port: 8089
+#
+#spring:
+#  application:
+#    name: gateway-service
+#
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: user-service-route--AUTH-SERVICE-refresh-token
+#          uri: lb://AUTH-SERVICE
+#          predicates:
+#            - Path=/api/auth/refresh-token
+#            - Method=PUT
+#
+#        - id: user-service-route--AUTH-SERVICE-register-phone
+#          uri: lb://AUTH-SERVICE
+#          predicates:
+#            - Path=/api/auth/register/phone
+#            - Method=POST
+##          filters:
+##            - RewritePath=/user/(?<segment>.*), /${segment} # могут обращаться все
+#
+#
+#        - id: user-service-route-AUTH-SERVICE-login
+#          uri: lb://AUTH-SERVICE
+#          predicates:
+#            - Path=/api/auth/login
+#            - Method=POST
+#        - id: user-service-route-AUTH-SERVICE-login
+#          uri: lb://AUTH-SERVICE
+#          predicates:
+#            - Path=/api/auth/user
+#            - Method=GET
+##          filters:
+##            - RewritePath=/user/(?<segment>.*), /${segment}
+##            - name: JwtAuthGatewayFilterFactory
+##              args:
+##                requiredRole: EMPLOYEE  # могут обращаться только EMPLOYEE
+
+server:
+  port: 8089
+
+spring:
+  main:
+    web-application-type: reactive
+
+
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service-route
+          uri: lb://auth-service  # URI микросервиса, к которому нужно обратиться
+          predicates:
+            - Path=/api/auth/register/phone  # Предикат для сопоставления пути
+            - Method=POST
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/  # URL Eureka сервера для регистрации сервисов

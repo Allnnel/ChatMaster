@@ -1,22 +1,23 @@
 package org.example.security.jwt;
 
-import org.example.exception.CustomException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.User;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.authority.AuthorityUtils;
+//import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+
+import static java.lang.System.out;
 
 
 @Component
@@ -32,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
+            out.println("111111");
             // Извлечение токена из запроса
             String token = extractTokenFromRequest(request);
             if (token != null) {
@@ -39,11 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 User user = service.findByToken(token);
                 if (user != null) {
                     // Создание объекта аутентификации с ролями пользователя
-                    List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_" + user.getRole());
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+//                    List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_" + user.getRole());
+//                    Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
                     // Установка объекта аутентификации в контекст безопасности
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    logger.info("User {} successfully authenticated with roles: {}" + user.getPhone() + " " + authorities);
+//                    SecurityContextHolder.getContext().setAuthentication(authentication);
+//                    logger.info("User {} successfully authenticated with roles: {} " + user.getPhone() + authorities);
                 }
             }
             // Продолжение цепочки фильтров
@@ -71,6 +73,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
-
 }
