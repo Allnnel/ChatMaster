@@ -13,8 +13,8 @@ public class ResponseMessageObject extends ResponseMessage{
     private Object object;
     public ResponseMessageObject() {
     }
-    public ResponseMessageObject(String status, String message, int code, String jwtToken, Object object) {
-        super(status, message, code, jwtToken);
+    public ResponseMessageObject(String status, String message, Integer code, String jwtToken, Object object) {
+        super(status, code, message, jwtToken);
         this.object = object;
     }
 }

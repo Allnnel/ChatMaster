@@ -1,9 +1,10 @@
 package org.example.error;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.attribute.response.ResponseMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,45 +14,34 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
-import static java.lang.System.out;
-
 @ControllerAdvice
 @RestController
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {HttpClientErrorException.class, HttpServerErrorException.class, ResourceAccessException.class})
-    public ResponseEntity<ResponseMessage> handleHttpExceptions(Exception ex)  {
-        out.println("111111");
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // По умолчанию внутренняя ошибка сервера
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-        if (ex instanceof HttpClientErrorException) {
-            status = (HttpStatus) ((HttpClientErrorException) ex).getStatusCode();
-        } else if (ex instanceof HttpServerErrorException) {
-            status = (HttpStatus) ((HttpServerErrorException) ex).getStatusCode();
-        } else if (ex instanceof ResourceAccessException) {
-            status = HttpStatus.SERVICE_UNAVAILABLE;
-        }
 
-        // Получаем JSON из сообщения исключения
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @ExceptionHandler(value = {HttpClientErrorException.class, HttpServerErrorException.class, ResourceAccessException.class, RuntimeException.class})
+    public ResponseEntity<ResponseMessage> handleHttpExceptions(Exception ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String jsonErrorMessage = extractJsonErrorMessage(ex.getMessage());
-
-        ObjectMapper objectMapper = new ObjectMapper();
+        logger.info("jsonErrorMessage : {}", ex.getMessage());
         try {
             ResponseMessage errorResponse = objectMapper.readValue(jsonErrorMessage, ResponseMessage.class);
             return ResponseEntity.status(status).body(errorResponse);
         } catch (JsonProcessingException e) {
-            // В случае ошибки парсинга возвращаем стандартное сообщение об ошибке
-            return ResponseEntity.status(status).body(new ResponseMessage("fail", e.getMessage(), status.value(), null));
+            return ResponseEntity.status(status).body(new ResponseMessage("Failed", status.value(), e.getMessage(), null));
         }
     }
 
-    // Метод для извлечения JSON из сообщения исключения
     private String extractJsonErrorMessage(String errorMessage) {
-        // Находим индекс начала JSON-строки
         int startIndex = errorMessage.indexOf('{');
-        // Находим индекс конца JSON-строки
         int endIndex = errorMessage.lastIndexOf('}');
-        // Вырезаем JSON-строку из сообщения исключения
+        if (startIndex == -1 || endIndex == -1 || startIndex >= endIndex) {
+            return errorMessage;
+        }
         return errorMessage.substring(startIndex, endIndex + 1);
     }
 }

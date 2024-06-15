@@ -31,7 +31,7 @@ spring:
           filters:
             - name: JwtAuth
               args:
-                requiredRole: EMPLOYEE
+                allowedRoles: ["ADMIN"]
 
         - id: auth-service-route-get-user
           uri: lb://auth-service
@@ -41,7 +41,9 @@ spring:
           filters:
             - name: JwtAuth
               args:
-                requiredRole: EMPLOYEE
+                allowedRoles: ["EMPLOYEE", "ADMIN"]
+
+
 
 eureka:
   client:

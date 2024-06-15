@@ -1,17 +1,14 @@
 package org.example.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.example.exception.CustomException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 import java.util.Arrays;
-
+@Data
 @Entity
-@Getter
-@Setter
 @Table(name = "user_chat")
 public class User {
     @Id
