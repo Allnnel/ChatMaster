@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
-import static java.lang.System.out;
-
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,9 +27,7 @@ public class AuthController {
 
     @GetMapping("user")
     public ResponseEntity<ResponseMessage> getUser(@RequestParam String token) throws CustomException {
-        out.println("getUser");
         User user = userService.findByToken(token);
-        out.println("user == " + user);
         return ResponseEntity.ok().body(
                 new ResponseMessageObject("Success", null, 200, token, new UserDto(user.getLogin(), user.getRole(), user.getPhone()))
         );
@@ -41,7 +37,6 @@ public class AuthController {
     public ResponseEntity<ResponseMessage> register(@RequestParam String login, @RequestParam char[] password,
                                                     @RequestParam String role, @RequestParam String phone,
                                                     @RequestParam int code) throws CustomException {
-        out.println("111111");
         try {
             String token = jwtTokenProvider.generateToken(login, role);
             User user = new User(login, password, role, token, phone);
