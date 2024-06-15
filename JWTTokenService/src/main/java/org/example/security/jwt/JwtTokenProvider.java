@@ -1,13 +1,12 @@
 package org.example.security.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import org.example.exception.CustomException;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
+
 @Component
 public class JwtTokenProvider {
 
