@@ -142,7 +142,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>server</finalName>
+		<finalName>service</finalName>
 		<plugins>
 			<!-- Maven Compiler Plugin -->
 			<plugin>

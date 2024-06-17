@@ -1,0 +1,31 @@
+server:
+  port: 8087
+
+jwt:
+  secretKeyString: "2yWX%8FhB1z!KQd@P3mZvfA$LgXnSjWn"
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: myDatabase
+      username: rhogoron
+      password: rhogoron
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: message-service
+  main:
+    web-application-type: reactive
+    allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
