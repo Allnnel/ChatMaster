@@ -4,4 +4,6 @@ eureka - "http://localhost:8761"
 
 PostgreSQL - "http://localhost:8080"
 
-mongoDB - "http://localhost:8081"
+redis - "http://localhost:8081"
+
+mongoDB - "http://localhost:8086"
