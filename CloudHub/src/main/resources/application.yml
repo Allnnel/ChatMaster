@@ -1,6 +1,10 @@
 server:
   port: 8089
 
+jwt:
+  secretKeyString: "2yWX%8FhB1z!KQd@P3mZvfA$LgXnSjWn"
+
+
 spring:
   main:
     web-application-type: reactive

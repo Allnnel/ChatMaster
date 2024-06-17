@@ -1,7 +1,9 @@
 package org.example.security.jwt;
 
 import io.jsonwebtoken.*;
+import jakarta.annotation.PostConstruct;
 import org.example.exception.CustomException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,15 +12,16 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final SecretKey secretKey;
-    public JwtTokenProvider() {
-        String secretKeyString = "2yWX%8FhB1z!KQd@P3mZvfA$LgXnSjWn";
-        // Преобразование строки в секретный ключ
-        byte[] secretKeyBytes = secretKeyString.getBytes();
-        this.secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
+    private SecretKey secretKey;
+
+    @Value("${jwt.secretKeyString}")
+    private String secretKeyString;
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = new SecretKeySpec(secretKeyString.getBytes(), SignatureAlgorithm.HS512.getJcaName());
     }
 
-    // Метод для генерации JWT токена на основе имени пользователя и роли
     public String generateToken(String login, String role) {
         Date now = new Date();
         // Рассчет времени истечения срока действия токена (24 часа после текущего времени)
@@ -33,7 +36,6 @@ public class JwtTokenProvider {
                 .compact(); // Компактное представление токена в виде строки
     }
 
-    // Метод для извлечения имени пользователя из JWT токена
     public String getUsernameFromToken(String token) throws CustomException {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
@@ -46,7 +48,6 @@ public class JwtTokenProvider {
         }
     }
 
-    // Метод для извлечения роли из JWT токена
     public String getRoleFromToken(String token) throws CustomException {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
