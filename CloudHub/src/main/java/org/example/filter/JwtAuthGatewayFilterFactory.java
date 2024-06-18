@@ -1,24 +1,25 @@
 package org.example.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.example.attribute.response.ResponseMessage;
+import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
-import io.jsonwebtoken.*;
 
 @Component
 public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<JwtAuthGatewayFilterFactory.Config> {
@@ -49,7 +50,7 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
                 HttpHeaders headers = exchange.getRequest().getHeaders();
                 String token = headers.getFirst(HttpHeaders.AUTHORIZATION);
                 if (token == null || !token.startsWith("Bearer ")) {
-                    logger.info("Missing or invalid authorization header");
+                    logger.error("Error : Missing or invalid authorization header");
                     return Mono.error(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Missing or invalid authorization header"));
                 }
                 token = token.replace("Bearer ", "");
@@ -62,15 +63,18 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
                     if (requiredRoles != null && requiredRoles.length > 0) {
                         boolean hasPermission = Arrays.asList(requiredRoles).contains(userRole);
                         if (!hasPermission) {
+                            logger.error("Error : User does not have permission to access this resource");
                             String json = objectMapper.writeValueAsString(new ResponseMessage("Failed", 403, "User does not have permission to access this resource", null));
                             return Mono.error(new HttpClientErrorException(HttpStatus.FORBIDDEN, json));
                         }
                     }
                 } catch (JwtException e) {
+                    logger.error("Error: {}", e.getMessage());
                     String json = objectMapper.writeValueAsString(new ResponseMessage("Failed", 403, "Invalid token", null));
                     return Mono.error(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, json));
                 }
             } catch (Exception ex) {
+                logger.error("Error: {}", ex.getMessage());
                 return Mono.error(ex);
             }
             return chain.filter(exchange);

@@ -26,6 +26,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         // Рассчет времени истечения срока действия токена (24 часа после текущего времени)
         Date expiryDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+//        Date expiryDate = new Date(now.getTime() + 1 * 60 * 1000);
         // Генерация JWT токена с указанием подлежащего, времени создания и времени истечения срока действия
         return Jwts.builder()
                 .claim("role", role) // Добавление роли в токен
